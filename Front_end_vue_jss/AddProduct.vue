@@ -1,77 +1,57 @@
-# test_app.py
+<template>
+  <div>
+    <h2>Add Product</h2>
+    <form @submit.prevent="addProduct">
+      <label for="name">Name:</label>
+      <input type="text" v-model="productName" required>
+      
+      <label for="price">Price:</label>
+      <input type="number" v-model="productPrice" required>
+      
+      <label for="expirationDate">Expiration Date:</label>
+      <input type="date" v-model="productExpirationDate" required>
+      
+      <label for="quantityInStock">Quantity in Stock:</label>
+      <input type="number" v-model="productQuantityInStock" required>
 
-from fastapi.testclient import TestClient
-from app import app
-import pytest
-client = TestClient(app)
+      <button type="submit">Add Product</button>
+    </form>
+  </div>
+</template>
 
-def test_get_products():
-    response = client.get("/products")
-    assert response.status_code == 200
-    assert len(response.json()) == 0
-# test_app.py
+<script>
+import axios from 'axios';
 
-@pytest.fixture
-def created_product():
-    product_data = {
-        "name": "Test Product",
-        "price": 9.99,
-        "expiration_date": "2022-12-31",
-        "quantity_in_stock": 10
-    }
-    response = client.post("/products", json=product_data)
-    assert response.status_code in [200, 201]  # Updated assertion to handle both 200 and 201
-    return response.json()
-
-
-# test_app.py
-
-def test_get_products():
-    response = client.get("/products")
-    assert response.status_code == 200
-    # Update the expected number of products according to your test data
-    assert len(response.json()) == 41  # Update to the correct number of products
-
-
-
-def test_update_product(created_product):
-    product_id = created_product["product_id"]
-    updated_product_data = {
-        "name": "Updated Product",
-        "price": 12.99,
-        "expiration_date": "2023-06-30",
-        "quantity_in_stock": 15
-    }
-    response = client.put(f"/products/{product_id}", json=updated_product_data)
-    assert response.status_code == 200
-    assert response.json()["name"] == "Updated Product"
-    assert response.json()["price"] == 12.99
-    assert response.json()["expiration_date"] == "2023-06-30"
-    assert response.json()["quantity_in_stock"] == 15
-
-def test_delete_product(created_product):
-    product_id = created_product["product_id"]
-    response = client.delete(f"/products/{product_id}")
-    assert response.status_code == 200
-    assert response.json()["message"] == "Product deleted successfully"
-
-def test_record_purchase(created_product):
-    product_id = created_product["product_id"]
-    purchase_quantity = 5
-    response = client.post(f"/products/{product_id}/purchase", json={"quantity_purchased": purchase_quantity})
-    assert response.status_code == 200
-    assert response.json()["transaction_id"] is not None
-    assert response.json()["product_id"] == product_id
-    assert response.json()["transaction_type"] == "purchase"
-    assert response.json()["quantity"] == purchase_quantity
-
-def test_record_sale(created_product):
-    product_id = created_product["product_id"]
-    sale_quantity = 3
-    response = client.post(f"/products/{product_id}/sale", json={"quantity_sold": sale_quantity})
-    assert response.status_code == 200
-    assert response.json()["transaction_id"] is not None
-    assert response.json()["product_id"] == product_id
-    assert response.json()["transaction_type"] == "sale"
-    assert response.json()["quantity"] == sale_quantity
-
+export default {
+  data() {
+    return {
+      productName: '',
+      productPrice: 0,
+      productExpirationDate: '',
+      productQuantityInStock: 0,
+    };
+  },
+  methods: {
+    async addProduct() {
+      try {
+        const response = await axios.post('http://localhost:8000/products', {
+          name: this.productName,
+          price: this.productPrice,
+          expiration_date: this.productExpirationDate,
+          quantity_in_stock: this.productQuantityInStock,
+        });
+        console.log('Product added successfully:', response.data);
+        // Optionally, update the product list after adding
+        this.$emit('product-added');
+        // Reset form fields
+        this.productName = '';
+        this.productPrice = 0;
+        this.productExpirationDate = '';
+        this.productQuantityInStock = 0;
+      } catch (error) {
+        console.error('Error adding product:', error);
+      }
+    },
+  },
+};
+</script>
