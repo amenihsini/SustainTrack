@@ -1,9 +1,6 @@
 # models.py
 
-from datetime import datetime
-from sqlalchemy import Column, String, Float, Date, Integer, ForeignKey, DateTime
-from sqlalchemy.orm import declarative_base, relationship
-
+from imports import *
 Base = declarative_base()
 
 class Product(Base):
