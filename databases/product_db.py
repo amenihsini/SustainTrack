@@ -1,11 +1,5 @@
 # database.py
-from typing import Tuple
-from fastapi import FastAPI, Depends
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from models import Base, Product  # Import Product
-
+ from imports import *
 def create_app() -> Tuple[FastAPI, DeclarativeMeta]:
     app = FastAPI()
 
