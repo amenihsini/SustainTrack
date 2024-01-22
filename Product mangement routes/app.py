@@ -237,6 +237,23 @@ async def record_sale(
 
     return {"message": "Sale recorded successfully"}
 
+@app.post('/token', response_model=dict)
+async def token(username: str, password: str, grant_type: str = "password", db: Session = Depends(get_db)):
+    # Perform user authentication
+    user = authenticate_user(username, password, db)
+
+    # Obtain user roles from the database or any other source
+    roles = get_user_roles(username, db)
+
+    # Create JWT token with user information and roles
+    jwt_token = create_access_token({"sub": username}, roles=roles)
+
+    return {"access_token": jwt_token, "token_type": "bearer"}
+
+@app.get('/users/me', response_model=TokenData)
+async def read_users_me(current_user: TokenData = Depends(decode_access_token)):
+    return current_user
+
 
 if __name__ == '__main__':
     import uvicorn
