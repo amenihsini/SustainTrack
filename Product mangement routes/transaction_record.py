@@ -1,9 +1,5 @@
 # transaction_record.py
-from datetime import datetime
-from uuid import uuid4
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
-from sqlalchemy.orm import declarative_base, relationship
-from models import Base, Product  # Import Product and Base
+from imports import *
 
 class Transaction(Base):
     __tablename__ = 'transaction'
